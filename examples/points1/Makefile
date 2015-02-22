@@ -15,10 +15,10 @@ LIB += ../../matrix.o
 
 all: $(PROG)
 
-points1:
+points1: main.c
 	$(CC) $(CFLAGS) -D__MUKAGL__ main.c $(LIB) $(LDFLAGS) -o points1
 
-points1-gl:
+points1-gl: main.c
 	$(CC) $(CFLAGS) main.c $(LDFLAGS) $(LDFLAGS_GL) -o points1-gl
 
 clean:

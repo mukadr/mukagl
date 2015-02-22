@@ -14,7 +14,7 @@
 #define HEIGHT 500
 
 float camx = 0.0f;
-float camy = 1.0f;
+float camy = 0.0f;
 float camz = 4.0f;
 
 void display(void)
@@ -33,11 +33,42 @@ void display(void)
 		for (i = 0; i < 50; i += 5) {
 			int a = (angle + i) % 360;
 
+			// X
+			glPushMatrix();
+			glRotatef(a, 1.0f, 0.0f, 0.0f);
+
+			glBegin(GL_POINTS);
+			glVertex3f(-0.5f + 0.05f * j, 1.0f, 0.0f);
+			glEnd();
+
+			glPopMatrix();
+
+			// Y
 			glPushMatrix();
 			glRotatef(a, 0.0f, 1.0f, 0.0f);
 
 			glBegin(GL_POINTS);
-			glVertex3f(1.0f, 0.04f * j, 0.0f);
+			glVertex3f(1.0f, -0.5f + 0.05f * j, 0.0f);
+			glEnd();
+
+			glPopMatrix();
+
+			// X
+			glPushMatrix();
+			glRotatef(a, 1.0f, 0.0f, 0.0f);
+
+			glBegin(GL_POINTS);
+			glVertex3f(-0.5f + 0.05f * j, -1.0f, 0.0f);
+			glEnd();
+
+			glPopMatrix();
+
+			// Y
+			glPushMatrix();
+			glRotatef(a, 0.0f, 1.0f, 0.0f);
+
+			glBegin(GL_POINTS);
+			glVertex3f(-1.0f, -0.5f + 0.05f * j, 0.0f);
 			glEnd();
 
 			glPopMatrix();
@@ -71,9 +102,9 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB);
 
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(800, 600);
 	glutInitWindowPosition(300, 200);
-	glutCreateWindow("Hello World!");
+	glutCreateWindow("GL_POINTS example1");
 
 	glutReshapeFunc(resize);
 	glutDisplayFunc(display);
