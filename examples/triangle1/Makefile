@@ -1,21 +1,23 @@
 CC = gcc
-PROG = mukagl
+PROG = triangle1
 
 CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
 CFLAGS += -Wshadow
+CFLAGS += -D__MUKAGL__
 
-LDFLAGS = -lm -lX11
+LDFLAGS  = -lm -lX11
+#LDFLAGS += -lGL -lGLU -lglut
 
-OBJS  = gl.o
-OBJS += gl_x11.o
-OBJS += main.o
-OBJS += matrix.o
-OBJS += vector.o
+OBJS  = main.o
+OBJS += ../../gl.o
+OBJS += ../../gl_x11.o
+OBJS += ../../vector.o
+OBJS += ../../matrix.o
 
 all: $(PROG)
 
-mukagl: $(OBJS)
+triangle1: $(OBJS)
 	@echo "  LINK    $@"
 	@$(CC) $^ $(LDFLAGS) -o $@
 

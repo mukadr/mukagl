@@ -11,7 +11,7 @@
 #include "matrix.h"
 #include "vector.h"
 
-struct {
+static struct {
 	Display		*display;
 	int		 screen;
 	Window		 window;

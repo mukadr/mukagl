@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "gl.h"
+#include "gl_internal.h"
 #include "matrix.h"
 #include "util.h"
 #include "vector.h"
@@ -98,11 +99,16 @@ void gluPerspective(float fovy, float aspect, float near, float far)
 	matp->mat[0][0] = zoomx;
 	matp->mat[1][1] = zoomy;
 
-	matp->mat[2][2] = (far+near)/(far-near);
-	matp->mat[3][2] = 1.0f;
+	matp->mat[2][2] = -(far+near)/(far-near);
+	matp->mat[3][2] = -1.0f;
 
 	matp->mat[2][3] = (-2*near*far)/(far-near);
 	matp->mat[3][3] = 0.0f;
+}
+
+void glClearColor(float r, float g, float b, float a)
+{
+
 }
 
 void glBegin(int mode)
@@ -117,5 +123,29 @@ void glEnd(void)
 
 void glVertex3f(float x, float y, float z)
 {
+	vec4 a = { x, y, z, 1.0f };
+	int w = gl_view_width();
+	int h = gl_view_height();
+	int xx;
+	int yy;
 
+	mat44_mul_vec4(transform, a);
+
+	if (a[3] < 0.0001f)
+		return;
+
+	// w division
+	a[0] /= a[3];
+	a[1] /= a[3];
+	a[2] /= a[3];
+
+	if (a[0] < -1.0f || a[0] > 1.0f ||
+	    a[1] < -1.0f || a[1] > 1.0f ||
+	    a[2] < -1.0f || a[2] > 1.0f)
+		return;
+
+	xx = a[0]*(w/2) + w/2;
+	yy = -a[1]*(h/2) + h/2;
+
+	gl_raster_point(xx, yy);
 }
