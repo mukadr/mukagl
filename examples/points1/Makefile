@@ -1,33 +1,27 @@
 CC = gcc
-PROG = points1
+PROG = points1 points1-gl
 
 CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
 CFLAGS += -Wshadow
-CFLAGS += -D__MUKAGL__
 
-LDFLAGS  = -lm -lX11
-#LDFLAGS += -lGL -lGLU -lglut
+LDFLAGS     = -lm -lX11
+LDFLAGS_GL  = -lGL -lGLU -lglut
 
-OBJS  = main.o
-OBJS += ../../gl.o
-OBJS += ../../gl_x11.o
-OBJS += ../../vector.o
-OBJS += ../../matrix.o
+LIB  = ../../gl.o
+LIB += ../../gl_x11.o
+LIB += ../../vector.o
+LIB += ../../matrix.o
 
 all: $(PROG)
 
-points1: $(OBJS)
-	@echo "  LINK    $@"
-	@$(CC) $^ $(LDFLAGS) -o $@
+points1:
+	$(CC) $(CFLAGS) -D__MUKAGL__ main.c $(LIB) $(LDFLAGS) -o points1
 
--include $(patsubst %.o,.%.d,$(OBJS))
-
-%.o: %.c
-	@echo "  CC      $@"
-	@$(CC) $(CFLAGS) -MMD -MF .$*.d -c $<
+points1-gl:
+	$(CC) $(CFLAGS) main.c $(LDFLAGS) $(LDFLAGS_GL) -o points1-gl
 
 clean:
-	rm -f $(PROG) *.o *.so .*.d
+	rm -f $(PROG) *.o
 
 .PHONY: all clean
