@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "matrix.h"
+#include "util.h"
 #include "vector.h"
 
 void mat44_identity(mat44 m)
@@ -26,13 +27,13 @@ void mat44_mul(mat44 m, mat44 n)
 	memcpy(m, ret, sizeof(mat44));
 }
 
-void vec4_mul_mat44(vec4 a, mat44 m)
+void mat44_mul_vec4(mat44 m, vec4 a)
 {
 	int i;
 	vec4 ret;
 
 	for (i = 0; i < 4; i++)
-		ret[i] = (a[0] * m[0][i]) + (a[1] * m[1][i]) + (a[2] * m[2][i]) + (a[3] * m[3][i]);
+		ret[i] = (a[0] * m[i][0]) + (a[1] * m[i][1]) + (a[2] * m[i][2]) + (a[3] * m[i][3]);
 
 	memcpy(a, ret, sizeof(mat44));
 }
@@ -52,15 +53,15 @@ void mat44_transpose(mat44 m)
 void mat44_rotx(mat44 m, float angle)
 {
 	mat44 rot = {};
-	float co = cosf(M_PI/180 * angle);
-	float si = sinf(M_PI/180 * angle);
+	float co = cosf(deg2radf(angle));
+	float si = sinf(deg2radf(angle));
 
 	rot[0][0] = 1.0f;
 
 	rot[1][1] = co;
-	rot[1][2] = si;
+	rot[2][1] = si;
 
-	rot[2][1] = -si;
+	rot[1][2] = -si;
 	rot[2][2] = co;
 
 	rot[3][3] = 1.0f;
@@ -71,15 +72,15 @@ void mat44_rotx(mat44 m, float angle)
 void mat44_roty(mat44 mat, float angle)
 {
 	mat44 rot = {};
-	float co = cosf(M_PI/180 * angle);
-	float si = sinf(M_PI/180 * angle);
+	float co = cosf(deg2radf(angle));
+	float si = sinf(deg2radf(angle));
 
 	rot[0][0] = co;
-	rot[0][2] = -si;
+	rot[2][0] = -si;
 
 	rot[1][1] = 1.0f;
 
-	rot[2][0] = si;
+	rot[0][2] = si;
 	rot[2][2] = co;
 
 	rot[3][3] = 1.0f;
@@ -90,13 +91,13 @@ void mat44_roty(mat44 mat, float angle)
 void mat44_rotz(mat44 mat, float angle)
 {
 	mat44 rot = {};
-	float co = cosf(M_PI/180 * angle);
-	float si = sinf(M_PI/180 * angle);
+	float co = cosf(deg2radf(angle));
+	float si = sinf(deg2radf(angle));
 
 	rot[0][0] = co;
-	rot[0][1] = si;
+	rot[1][0] = si;
 
-	rot[1][0] = -si;
+	rot[0][1] = -si;
 	rot[1][1] = co;
 
 	rot[2][2] = 1.0f;
@@ -124,9 +125,9 @@ void mat44_translate(mat44 m, float x, float y, float z)
 
 	mat44_identity(trans);
 
-	trans[3][0] = x;
-	trans[3][1] = y;
-	trans[3][2] = z;
+	trans[0][3] = x;
+	trans[1][3] = y;
+	trans[2][3] = z;
 
 	mat44_mul(m, trans);
 }

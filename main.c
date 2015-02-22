@@ -67,10 +67,10 @@ void setup_camera(mat44 cam,
 {
 	mat44_identity(cam);
 
-	mat44_translate(cam, -x, -y, -z);
 	mat44_rotx(cam, -ax);
 	mat44_roty(cam, -ay);
 	mat44_rotz(cam, -az);
+	mat44_translate(cam, -x, -y, -z);
 }
 
 // Setups a clip matrix. objects visible in the view frustrum will appear inside
@@ -111,9 +111,9 @@ void setup_projection(mat44 clip, float fovx, float aspect, float near, float fa
 	clip[1][1] = zoomy;
 
 	clip[2][2] = (far+near)/(far-near);
-	clip[2][3] = 1.0f;
+	clip[3][2] = 1.0f;
 
-	clip[3][2] = (-2*near*far)/(far-near);
+	clip[2][3] = (-2*near*far)/(far-near);
 	clip[3][3] = 0.0f;
 }
 
@@ -126,22 +126,22 @@ void redraw(void)
 
 	mat44_identity(world_camera);
 
-	/* world transform */
-	mat44_roty(world_camera, angle);
+	/* clipping transform */
+	setup_projection(clip, 90.0f, WND_WIDTH/WND_HEIGHT, 0.1f, 30.0f);
+	mat44_mul(world_camera, clip);
 
 	/* camera transform */
 	setup_camera(camera, player.x, player.y, player.z, player.ax, player.ay, player.az);
 	mat44_mul(world_camera, camera);
 
-	/* clipping transform */
-	setup_projection(clip, 90.0f, WND_WIDTH/WND_HEIGHT, 0.1f, 30.0f);
-	mat44_mul(world_camera, clip);
+	/* world transform */
+	mat44_roty(world_camera, angle);
 
 	XClearWindow(x11.display, x11.window);
 
 	float v4[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 
-	vec4_mul_mat44(v4, world_camera);
+	mat44_mul_vec4(world_camera, v4);
 
 	draw_vec4(v4);
 
