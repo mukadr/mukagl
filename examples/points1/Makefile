@@ -1,5 +1,5 @@
 CC = gcc
-PROG = triangle1
+PROG = points1
 
 CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
@@ -17,7 +17,7 @@ OBJS += ../../matrix.o
 
 all: $(PROG)
 
-triangle1: $(OBJS)
+points1: $(OBJS)
 	@echo "  LINK    $@"
 	@$(CC) $^ $(LDFLAGS) -o $@
 

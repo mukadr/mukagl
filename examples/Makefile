@@ -1,7 +1,7 @@
 all:
-	make -C ./triangle1
+	make -C ./points1
 
 clean:
-	make -C ./triangle1 clean
+	make -C ./points1 clean
 
 .PHONY: all clean
