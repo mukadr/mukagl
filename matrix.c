@@ -35,7 +35,7 @@ void mat44_mul_vec4(mat44 m, vec4 a)
 	for (i = 0; i < 4; i++)
 		ret[i] = (a[0] * m[i][0]) + (a[1] * m[i][1]) + (a[2] * m[i][2]) + (a[3] * m[i][3]);
 
-	memcpy(a, ret, sizeof(mat44));
+	memcpy(a, ret, sizeof(vec4));
 }
 
 void mat44_transpose(mat44 m)
