@@ -7,7 +7,8 @@ CFLAGS += -Wshadow
 
 LDFLAGS = -lm -lX11
 
-OBJS  = main.o
+OBJS  = gl.o
+OBJS += main.o
 OBJS += matrix.o
 OBJS += vector.o
 
