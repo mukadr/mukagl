@@ -9,15 +9,12 @@ LDFLAGS = -lm -lX11
 
 OBJS  = gl.o
 OBJS += gl_x11.o
-OBJS += main.o
 OBJS += matrix.o
 OBJS += vector.o
 
 all: $(PROG)
 
 mukagl: $(OBJS)
-	@echo "  LINK    $@"
-	@$(CC) $^ $(LDFLAGS) -o $@
 
 -include $(patsubst %.o,.%.d,$(OBJS) fuse.o ghost.o)
 
