@@ -10,9 +10,6 @@
 
 #include <stdio.h>
 
-#define WIDTH 500
-#define HEIGHT 500
-
 float camx = 0.0f;
 float camy = 0.0f;
 float camz = 4.0f;
@@ -91,7 +88,7 @@ void resize(int w, int h)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0f, (float)WIDTH/HEIGHT, 0.1f, 10.0f);
+	gluPerspective(60.0f, (float)w/h, 0.1f, 10.0f);
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -102,7 +99,7 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB);
 
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(640, 480);
 	glutInitWindowPosition(300, 200);
 	glutCreateWindow("GL_POINTS example1");
 
