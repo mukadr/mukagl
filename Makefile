@@ -16,7 +16,7 @@ all: $(PROG)
 
 mukagl: $(OBJS)
 
--include $(patsubst %.o,.%.d,$(OBJS) fuse.o ghost.o)
+-include $(patsubst %.o,.%.d,$(OBJS))
 
 %.o: %.c
 	@echo "  CC      $@"

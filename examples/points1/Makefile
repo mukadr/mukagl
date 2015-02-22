@@ -21,7 +21,7 @@ points1: $(OBJS)
 	@echo "  LINK    $@"
 	@$(CC) $^ $(LDFLAGS) -o $@
 
--include $(patsubst %.o,.%.d,$(OBJS) fuse.o ghost.o)
+-include $(patsubst %.o,.%.d,$(OBJS))
 
 %.o: %.c
 	@echo "  CC      $@"
