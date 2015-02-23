@@ -2,10 +2,12 @@
 
 #ifdef __MUKAGL__
 #include "../../gl.h"
+#define TITLE_SUFFIX " (mukaGL)"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#define TITLE_SUFFIX " (OpenGL)"
 #endif
 
 #include <stdio.h>
@@ -101,7 +103,7 @@ int main(int argc, char *argv[])
 
 	glutInitWindowSize(640, 480);
 	glutInitWindowPosition(300, 200);
-	glutCreateWindow("GL_POINTS example1");
+	glutCreateWindow("GL_POINTS example1" TITLE_SUFFIX);
 
 	glutReshapeFunc(resize);
 	glutDisplayFunc(display);
