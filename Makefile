@@ -12,7 +12,10 @@ OBJS += gl_x11.o
 OBJS += matrix.o
 OBJS += vector.o
 
-all: $(PROG)
+all: $(PROG) examples
+
+examples:
+	make -C ./examples
 
 mukagl: $(OBJS)
 
@@ -24,5 +27,6 @@ mukagl: $(OBJS)
 
 clean:
 	rm -f $(PROG) *.o *.so .*.d
+	make clean -C ./examples
 
-.PHONY: all clean
+.PHONY: all clean examples
