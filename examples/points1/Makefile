@@ -5,11 +5,11 @@ CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
 CFLAGS += -Wshadow
 
-LDFLAGS     = -lm -lX11
+LDFLAGS     = -lm $(shell pkg-config --libs sdl2)
 LDFLAGS_GL  = -lGL -lGLU -lglut
 
 LIB  = ../../gl.o
-LIB += ../../gl_x11.o
+LIB += ../../gl_sdl2.o
 LIB += ../../vector.o
 LIB += ../../math.o
 LIB += ../../matrix.o

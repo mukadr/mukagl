@@ -8,7 +8,7 @@ The purpose of this project is to teach myself a bit more about 3d math and rend
 ##Prerequisites
 
 ```
-X11 development libraries
+SDL2 development libraries
 OpenGL development libraries (GL,GLU,GLUT)
 ```
 

@@ -4,11 +4,12 @@ PROG = mukagl
 CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
 CFLAGS += -Wshadow
+CFLAGS += $(shell pkg-config --cflags sdl2)
 
-LDFLAGS = -lm -lX11
+LDFLAGS = -lm $(shell pkg-config --libs sdl2)
 
 OBJS  = gl.o
-OBJS += gl_x11.o
+OBJS += gl_sdl2.o
 OBJS += math.o
 OBJS += matrix.o
 OBJS += vector.o
