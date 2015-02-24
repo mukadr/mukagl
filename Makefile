@@ -13,10 +13,13 @@ OBJS += math.o
 OBJS += matrix.o
 OBJS += vector.o
 
-all: $(PROG) examples
+all: $(PROG) examples test
 
 examples:
 	make -C ./examples
+
+test:
+	make -C ./test
 
 mukagl: $(OBJS)
 
@@ -29,5 +32,6 @@ mukagl: $(OBJS)
 clean:
 	rm -f $(PROG) *.o *.so .*.d
 	make clean -C ./examples
+	make clean -C ./test
 
-.PHONY: all clean examples
+.PHONY: all clean examples test
