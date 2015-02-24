@@ -16,6 +16,8 @@ static struct {
 	int x, y;
 	int w, h;
 	int quit;
+	SDL_Color color;
+	SDL_Color clear_color;
 } sdl = {
 	.x = 0,
 	.y = 0,
@@ -43,9 +45,34 @@ void gl_raster_point(int x, int y)
 	SDL_RenderDrawPoint(sdl.renderer, x, y);
 }
 
-void glClear(int opts)
+void gl_color(float r, float g, float b, float a)
 {
+	sdl.color.r = r * 255;
+	sdl.color.g = g * 255;
+	sdl.color.b = b * 255;
+	sdl.color.a = a * 255;
+
+	SDL_SetRenderDrawColor(sdl.renderer, sdl.color.r, sdl.color.g,
+			sdl.color.b, sdl.color.a);
+}
+
+void gl_clear_color(float r, float g, float b, float a)
+{
+	sdl.clear_color.r = r * 255;
+	sdl.clear_color.g = g * 255;
+	sdl.clear_color.b = b * 255;
+	sdl.clear_color.a = a * 255;
+}
+
+void gl_clear_color_buffer(void)
+{
+	SDL_SetRenderDrawColor(sdl.renderer, sdl.clear_color.r, sdl.clear_color.g,
+			sdl.clear_color.b, sdl.clear_color.a);
+
 	SDL_RenderClear(sdl.renderer);
+
+	SDL_SetRenderDrawColor(sdl.renderer, sdl.color.r, sdl.color.g,
+			sdl.color.b, sdl.color.a);
 }
 
 void glutDisplayFunc(void (*func)(void))

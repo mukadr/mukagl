@@ -115,9 +115,19 @@ void gluPerspective(float fovy, float aspect, float near, float far)
 	matp->mat[3][3] = 0.0f;
 }
 
+void glClear(int opts)
+{
+	gl_clear_color_buffer();
+}
+
 void glClearColor(float r, float g, float b, float a)
 {
+	gl_clear_color(r, g, b, a);
+}
 
+void glColor3f(float r, float g, float b)
+{
+	gl_color(r, g, b, 1.0f);
 }
 
 static inline int is_visible(const vec3 v)

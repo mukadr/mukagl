@@ -40,6 +40,7 @@ void	glVertex3f(float x, float y, float z);
 // Miscellaneous
 void	glClear(int opts);
 void	glClearColor(float r, float g, float b, float a);
+void	glColor3f(float r, float g, float b);
 
 
 // GLUT

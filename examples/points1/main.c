@@ -32,6 +32,8 @@ void display(void)
 		for (i = 0; i < 50; i += 5) {
 			int a = (angle + i) % 360;
 
+			glColor3f((1.0f/359) * a, 0.0f, 0.0f);
+
 			// X
 			glPushMatrix();
 			glRotatef(a, 1.0f, 0.0f, 0.0f);
@@ -41,6 +43,8 @@ void display(void)
 			glEnd();
 
 			glPopMatrix();
+
+			glColor3f(0.0f, (1.0f/359) * a, 0.0f);
 
 			// Y
 			glPushMatrix();
@@ -52,6 +56,8 @@ void display(void)
 
 			glPopMatrix();
 
+			glColor3f(0.0f, 0.0f, (1.0f/359) * a);
+
 			// X
 			glPushMatrix();
 			glRotatef(a, 1.0f, 0.0f, 0.0f);
@@ -61,6 +67,8 @@ void display(void)
 			glEnd();
 
 			glPopMatrix();
+
+			glColor3f((1.0f/359) * a, 0.0f, (1.0f/359) * a);
 
 			// Y
 			glPushMatrix();
@@ -93,7 +101,7 @@ void resize(int w, int h)
 	gluPerspective(60.0f, (float)w/h, 0.1f, 10.0f);
 
 	glMatrixMode(GL_MODELVIEW);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 int main(int argc, char *argv[])
