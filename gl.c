@@ -6,9 +6,13 @@
 
 #include "gl.h"
 #include "gl_internal.h"
+#include "math.h"
 #include "matrix.h"
 #include "util.h"
 #include "vector.h"
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #define STACK_MAX	128
 
@@ -143,9 +147,46 @@ void raster_point(const vec3 v)
 	gl_raster_point(x, y);
 }
 
+static vec3 tribuf[3];
+static int tripos;
+
 void raster_triangle(const vec3 v)
 {
+	int x1, y1;
+	int x2, y2;
+	int x3, y3;
+	int minx, maxx;
+	int miny, maxy;
+	int x, y;
 
+	memcpy(tribuf[tripos++], v, sizeof(vec3));
+	if (tripos < 3)
+		return;
+
+	tripos = 0;
+
+	// if entire triangle is out of clipping zone, do nothing
+	if (!is_visible(tribuf[0]) &&
+	    !is_visible(tribuf[1]) &&
+	    !is_visible(tribuf[2]))
+		return;
+
+	clip_to_screen(tribuf[0], &x1, &y1);
+	clip_to_screen(tribuf[1], &x2, &y2);
+	clip_to_screen(tribuf[2], &x3, &y3);
+
+	minx = min(x1, min(x2, x3));
+	maxx = max(x1, max(x2, x3));
+	miny = min(y1, min(y2, y3));
+	maxy = max(y1, max(y2, y3));
+
+	// rasterize triangle
+	for (y = miny; y <= maxy; y++) {
+		for (x = minx; x <= maxx; x++) {
+			if (point_in_triangle_2i(x, y, x1, y1, x2, y2, x3, y3))
+				gl_raster_point(x, y);
+		}
+	}
 }
 
 void glBegin(int mode)

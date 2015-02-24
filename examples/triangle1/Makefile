@@ -1,5 +1,5 @@
 CC = gcc
-PROG = points1 points1-gl
+PROG = triangle1 triangle1-gl
 
 CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
@@ -16,10 +16,10 @@ LIB += ../../matrix.o
 
 all: $(PROG)
 
-points1: main.c
+triangle1: main.c
 	$(CC) $(CFLAGS) -D__MUKAGL__ main.c $(LIB) $(LDFLAGS) -o $@
 
-points1-gl: main.c
+triangle1-gl: main.c
 	$(CC) $(CFLAGS) main.c $(LDFLAGS) $(LDFLAGS_GL) -o $@
 
 clean:
