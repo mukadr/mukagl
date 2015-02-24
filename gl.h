@@ -8,6 +8,7 @@
 
 // Primitives
 #define GL_POINTS		0
+#define GL_TRIANGLES		1
 
 
 // glPush/PopAttrib bits

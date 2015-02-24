@@ -1,5 +1,7 @@
 // OpenGL like implementation based on mukagl
 
+#include <err.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "gl.h"
@@ -27,6 +29,9 @@ static struct glmatrix project;
 
 // final model-view-proj matrix
 static mat44 transform;
+
+// selected primitive (GL_POINTS, GL_TRIANGLES...)
+static void (*primitive_fn)(const vec3 v);
 
 static void update_transform(void)
 {
@@ -111,41 +116,73 @@ void glClearColor(float r, float g, float b, float a)
 
 }
 
-void glBegin(int mode)
+static inline int is_visible(const vec3 v)
+{
+	return v[0] >= -1.0f && v[0] <= 1.0f &&
+	       v[1] >= -1.0f && v[1] <= 1.0f &&
+	       v[2] >= -1.0f && v[2] <= 1.0f;
+}
+
+static inline void clip_to_screen(const vec3 v, int *px, int *py)
+{
+	int w = gl_view_width();
+	int h = gl_view_height();
+
+	*px = v[0]*(w/2) + w/2;
+	*py = -v[1]*(h/2) + h/2;
+}
+
+void raster_point(const vec3 v)
+{
+	int x, y;
+
+	if (!is_visible(v))
+		return;
+
+	clip_to_screen(v, &x, &y);
+	gl_raster_point(x, y);
+}
+
+void raster_triangle(const vec3 v)
 {
 
 }
 
+void glBegin(int mode)
+{
+	switch (mode) {
+	default:
+		warnx("gl: Unsupported primitive %d, defaulting to GL_POINTS", mode);
+	case GL_POINTS:
+		primitive_fn = raster_point;
+		break;
+	case GL_TRIANGLES:
+		primitive_fn = raster_triangle;
+		break;
+	}
+}
+
 void glEnd(void)
 {
-
+	primitive_fn = NULL;
 }
 
 void glVertex3f(float x, float y, float z)
 {
 	vec4 a = { x, y, z, 1.0f };
-	int w = gl_view_width();
-	int h = gl_view_height();
-	int xx;
-	int yy;
+	vec3 b;
 
 	mat44_mul_vec4(transform, a);
 
+	// Avoid division by zero (near clip should always be greater than this)
 	if (a[3] < 0.0001f)
 		return;
 
 	// w division
-	a[0] /= a[3];
-	a[1] /= a[3];
-	a[2] /= a[3];
+	b[0] = a[0]/a[3];
+	b[1] = a[1]/a[3];
+	b[2] = a[2]/a[3];
 
-	if (a[0] < -1.0f || a[0] > 1.0f ||
-	    a[1] < -1.0f || a[1] > 1.0f ||
-	    a[2] < -1.0f || a[2] > 1.0f)
-		return;
-
-	xx = a[0]*(w/2) + w/2;
-	yy = -a[1]*(h/2) + h/2;
-
-	gl_raster_point(xx, yy);
+	if (primitive_fn)
+		primitive_fn(b);
 }
