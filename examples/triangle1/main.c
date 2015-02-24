@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
 	glutInitWindowSize(640, 480);
 	glutInitWindowPosition(300, 200);
-	glutCreateWindow("GL_POINTS example1" TITLE_SUFFIX);
+	glutCreateWindow("GL_TRIANGLES example1" TITLE_SUFFIX);
 
 	glutReshapeFunc(resize);
 	glutDisplayFunc(display);
