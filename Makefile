@@ -9,6 +9,7 @@ LDFLAGS = -lm -lX11
 
 OBJS  = gl.o
 OBJS += gl_x11.o
+OBJS += math.o
 OBJS += matrix.o
 OBJS += vector.o
 
