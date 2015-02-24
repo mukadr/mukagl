@@ -16,6 +16,15 @@ float camx = 0.0f;
 float camy = 0.0f;
 float camz = 4.0f;
 
+static void draw_tri(void)
+{
+	glBegin(GL_TRIANGLES);
+	glVertex3f(-1.0f, -1.0f, 0.0f);
+	glVertex3f( 1.0f, -1.0f, 0.0f);
+	glVertex3f( 0.0f,  1.0f, 0.0f);
+	glEnd();
+}
+
 void display(void)
 {
 	static int angle = 0;
@@ -27,13 +36,34 @@ void display(void)
 	// camera
 	glTranslatef(-camx, -camy, -camz);
 
-	glRotatef(angle, 0.0f, 1.0f, 0.0f);
+	glPushMatrix();
 
-	glBegin(GL_TRIANGLES);
-	glVertex3f(-1.0f, -1.0f, 0.0f);
-	glVertex3f( 1.0f, -1.0f, 0.0f);
-	glVertex3f( 0.0f,  1.0f, 0.0f);
-	glEnd();
+	glTranslatef(-3.0f, 0.0f, -4.0f);
+	glRotatef(angle, 0.0f, 1.0f, 0.0f);
+	glColor3f(0.8f, 0.2f, 0.2f);
+
+	draw_tri();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-1.0f, 0.0f, -2.0f);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glColor3f(0.8f, 0.7f, 0.0f);
+
+	draw_tri();
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glTranslatef(1.0f, 0.0f, 0.0f);
+	glRotatef(angle, 1.0f, 0.0f, 0.0f);
+	glColor3f(0.2f, 0.2f, 0.8f);
+
+	draw_tri();
+
+	glPopMatrix();
 
 	if (++angle == 360)
 		angle = 0;
