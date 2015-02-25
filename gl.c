@@ -1,6 +1,5 @@
 // OpenGL like implementation based on mukagl
 
-#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -203,7 +202,7 @@ void glBegin(int mode)
 {
 	switch (mode) {
 	default:
-		warnx("gl: Unsupported primitive %d, defaulting to GL_POINTS", mode);
+		fprintf(stderr, "gl: Unsupported primitive %d, defaulting to GL_POINTS\n", mode);
 	case GL_POINTS:
 		primitive_fn = raster_point;
 		break;

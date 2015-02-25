@@ -1,8 +1,8 @@
 // SDL2 backend for mukaGL
 // Double buffered using SDL_Renderer
 
-#include <err.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <SDL.h>
@@ -108,8 +108,10 @@ void glutSwapBuffers(void)
 
 void glutInit(int *pargc, char **argv)
 {
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
-		errx(1, "gl_sdl2: SDL_Init: %s", SDL_GetError());
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+		fprintf(stderr, "gl_sdl2: SDL_Init: %s\n", SDL_GetError());
+		exit(1);
+        }
 }
 
 void glutInitWindowSize(int width, int height)
@@ -132,12 +134,16 @@ void glutInitDisplayMode(int mode)
 void glutCreateWindow(const char *title)
 {
 	sdl.window = SDL_CreateWindow(title, sdl.x, sdl.y, sdl.w, sdl.h, SDL_WINDOW_SHOWN);
-	if (!sdl.window)
-		errx(1, "gl_sdl2: SDL_CreateWindow: %s", SDL_GetError());
+	if (!sdl.window) {
+		fprintf(stderr, "gl_sdl2: SDL_CreateWindow: %s\n", SDL_GetError());
+		exit(1);
+        }
 
 	sdl.renderer = SDL_CreateRenderer(sdl.window, -1, SDL_RENDERER_ACCELERATED);
-	if (!sdl.renderer)
-		errx(1, "gl_sdl2: SDL_CreateRenderer: %s", SDL_GetError());
+	if (!sdl.renderer) {
+		fprintf(stderr, "gl_sdl2: SDL_CreateRenderer: %s\n", SDL_GetError());
+		exit(1);
+        }
 }
 
 void glutMainLoop(void)
