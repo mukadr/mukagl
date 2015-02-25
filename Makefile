@@ -5,6 +5,7 @@ CFLAGS  = -std=gnu99 -Wall -O2
 CFLAGS += -Werror-implicit-function-declaration
 CFLAGS += -Wshadow
 CFLAGS += $(shell pkg-config --cflags sdl2)
+CFLAGS += -D__MUKAGL_DEBUGFPS__
 
 LDFLAGS = -lm $(shell pkg-config --libs sdl2)
 

@@ -31,6 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-D__MUKAGL__" />
+			<Add option="-D__MUKAGL_DEBUGFPS__" />
 			<Add directory="../../SDL2-2.0.3/include" />
 		</Compiler>
 		<Linker>
