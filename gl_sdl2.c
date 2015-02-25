@@ -10,15 +10,9 @@
 #include "matrix.h"
 #include "vector.h"
 
-static struct {
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	int x, y;
-	int w, h;
-	int quit;
-	SDL_Color color;
-	SDL_Color clear_color;
-} sdl = {
+#include "gl_internal.h"
+
+struct gl_sdl2 sdl = {
 	.x = 0,
 	.y = 0,
 	.w = 300,
@@ -40,20 +34,12 @@ int gl_view_height(void)
 	return sdl.h;
 }
 
-void gl_raster_point(int x, int y)
-{
-	SDL_RenderDrawPoint(sdl.renderer, x, y);
-}
-
 void gl_color(float r, float g, float b, float a)
 {
 	sdl.color.r = r * 255;
 	sdl.color.g = g * 255;
 	sdl.color.b = b * 255;
 	sdl.color.a = a * 255;
-
-	SDL_SetRenderDrawColor(sdl.renderer, sdl.color.r, sdl.color.g,
-			sdl.color.b, sdl.color.a);
 }
 
 void gl_clear_color(float r, float g, float b, float a)
@@ -66,13 +52,10 @@ void gl_clear_color(float r, float g, float b, float a)
 
 void gl_clear_color_buffer(void)
 {
-	SDL_SetRenderDrawColor(sdl.renderer, sdl.clear_color.r, sdl.clear_color.g,
-			sdl.clear_color.b, sdl.clear_color.a);
+	int i;
 
-	SDL_RenderClear(sdl.renderer);
-
-	SDL_SetRenderDrawColor(sdl.renderer, sdl.color.r, sdl.color.g,
-			sdl.color.b, sdl.color.a);
+	for (i = 0; i < sdl.w * sdl.h; i++)
+		sdl.framebuf[i] = sdl.clear_color;
 }
 
 void glutDisplayFunc(void (*func)(void))
@@ -126,6 +109,8 @@ void glutPostRedisplay(void)
 
 void glutSwapBuffers(void)
 {
+	SDL_UpdateTexture(sdl.videobuf, NULL, sdl.framebuf, sdl.w * sizeof(SDL_Color));
+	SDL_RenderCopy(sdl.renderer, sdl.videobuf, NULL, NULL);
 	SDL_RenderPresent(sdl.renderer);
 }
 
@@ -167,6 +152,19 @@ void glutCreateWindow(const char *title)
 		fprintf(stderr, "gl_sdl2: SDL_CreateRenderer: %s\n", SDL_GetError());
 		exit(1);
         }
+
+	sdl.framebuf = malloc(sdl.w * sdl.h * sizeof(SDL_Color));
+	if (!sdl.framebuf) {
+		fprintf(stderr, "gl_sdl2: out of memory\n");
+		exit(1);
+	}
+
+	sdl.videobuf = SDL_CreateTexture(sdl.renderer, SDL_PIXELFORMAT_ARGB8888,
+					 SDL_TEXTUREACCESS_STREAMING, sdl.w, sdl.h);
+	if (!sdl.videobuf) {
+		fprintf(stderr, "gl_sdl2: SDL_CreateTexture: %s\n", SDL_GetError());
+		exit(1);
+	}
 }
 
 void glutMainLoop(void)
