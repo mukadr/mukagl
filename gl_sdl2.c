@@ -95,10 +95,33 @@ void glutReshapeFunc(void (*func)(int width, int height))
 	reshape_func = func;
 }
 
+#ifdef __MUKAGL_DEBUGFPS__
+static inline void debug_fps(void)
+{
+	static Uint32 last_ticks;
+	static int fps;
+	Uint32 now;
+
+	now = SDL_GetTicks();
+	if (now - last_ticks >= 1000) {
+		printf("%u fps\n", fps);
+		last_ticks = now;
+		fps = 0;
+	}
+	fps++;
+}
+#else
+static inline void debug_fps(void)
+{
+}
+#endif
+
 void glutPostRedisplay(void)
 {
 	if (display_func)
 		display_func();
+
+	debug_fps();
 }
 
 void glutSwapBuffers(void)
