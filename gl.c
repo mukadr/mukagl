@@ -1,10 +1,8 @@
-// OpenGL like implementation based on mukagl
-
 #include <stdio.h>
 #include <string.h>
 
 #include "gl.h"
-#include "gl_internal.h"
+#include "gl_sdl2.h"
 #include "math.h"
 #include "matrix.h"
 #include "util.h"

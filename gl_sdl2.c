@@ -10,7 +10,7 @@
 #include "matrix.h"
 #include "vector.h"
 
-#include "gl_internal.h"
+#include "gl_sdl2.h"
 
 struct gl_sdl2 sdl = {
 	.x = 0,
@@ -23,16 +23,6 @@ static void (*display_func)(void);
 static void (*idle_func)(void);
 static void (*keyboard_func)(unsigned char key, int x, int y);
 static void (*reshape_func)(int width, int height);
-
-int gl_view_width(void)
-{
-	return sdl.w;
-}
-
-int gl_view_height(void)
-{
-	return sdl.h;
-}
 
 void gl_color(float r, float g, float b, float a)
 {

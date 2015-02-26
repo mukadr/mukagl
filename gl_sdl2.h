@@ -16,8 +16,15 @@ extern struct gl_sdl2 {
 } sdl;
 
 // Viewport
-int	gl_view_width(void);
-int	gl_view_height(void);
+static inline int gl_view_width(void)
+{
+	return sdl.w;
+}
+
+static inline int gl_view_height(void)
+{
+	return sdl.h;
+}
 
 
 // Rasterization
