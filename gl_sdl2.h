@@ -6,13 +6,13 @@
 extern struct gl_sdl2 {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	SDL_Color *framebuf;
+	Uint32 *framebuf;
 	SDL_Texture *videobuf;
 	int x, y;
 	int w, h;
 	int quit;
-	SDL_Color color;
-	SDL_Color clear_color;
+	Uint32 color;
+	Uint32 clear_color;
 } sdl;
 
 // Viewport

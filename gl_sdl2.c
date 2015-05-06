@@ -26,18 +26,22 @@ static void (*reshape_func)(int width, int height);
 
 void gl_color(float r, float g, float b, float a)
 {
-	sdl.color.r = r * 255;
-	sdl.color.g = g * 255;
-	sdl.color.b = b * 255;
-	sdl.color.a = a * 255;
+	Uint32 ri = (Uint32)(r * 255);
+	Uint32 gi = (Uint32)(g * 255);
+	Uint32 bi = (Uint32)(b * 255);
+	Uint32 ai = (Uint32)(a * 255);
+
+	sdl.color = (ai << 24) | (bi << 16) | (gi << 8) | ri;
 }
 
 void gl_clear_color(float r, float g, float b, float a)
 {
-	sdl.clear_color.r = r * 255;
-	sdl.clear_color.g = g * 255;
-	sdl.clear_color.b = b * 255;
-	sdl.clear_color.a = a * 255;
+	Uint32 ri = (Uint32)(r * 255);
+	Uint32 gi = (Uint32)(g * 255);
+	Uint32 bi = (Uint32)(b * 255);
+	Uint32 ai = (Uint32)(a * 255);
+
+	sdl.clear_color = (ai << 24) | (bi << 16) | (gi << 8) | ri;
 }
 
 void gl_clear_color_buffer(void)
@@ -99,7 +103,7 @@ void glutPostRedisplay(void)
 
 void glutSwapBuffers(void)
 {
-	SDL_UpdateTexture(sdl.videobuf, NULL, sdl.framebuf, sdl.w * sizeof(SDL_Color));
+	SDL_UpdateTexture(sdl.videobuf, NULL, sdl.framebuf, sdl.w * 4);
 	SDL_RenderCopy(sdl.renderer, sdl.videobuf, NULL, NULL);
 	SDL_RenderPresent(sdl.renderer);
 }
@@ -143,7 +147,7 @@ void glutCreateWindow(const char *title)
 		exit(1);
         }
 
-	sdl.framebuf = malloc(sdl.w * sdl.h * sizeof(SDL_Color));
+	sdl.framebuf = malloc(sdl.w * sdl.h * 4);
 	if (!sdl.framebuf) {
 		fprintf(stderr, "gl_sdl2: out of memory\n");
 		exit(1);
