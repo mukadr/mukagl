@@ -13,6 +13,7 @@
 
 // glPush/PopAttrib bits
 #define GL_COLOR_BUFFER_BIT	1
+#define GL_DEPTH_BUFFER_BIT	2
 
 
 // Transformation
