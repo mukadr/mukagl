@@ -157,41 +157,176 @@ void raster_point(const vec3 v)
 static vec3 tribuf[3];
 static int tripos;
 
-void raster_triangle(const vec3 v)
+static inline void swap2i(int *a, int *b)
 {
-	int x1, y1;
-	int x2, y2;
-	int x3, y3;
-	int minx, maxx;
-	int miny, maxy;
+	int tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+struct cursor {
 	int x, y;
+	int x1, y1;
+	int dx, dy;
+	int err;
+	int incr;
+	void (*walk_fn)(struct cursor *);
+};
+
+static void cursor_walk81(struct cursor *c)
+{
+	c->x++;
+	c->err += c->dy;
+	if (2*c->err >= c->dx) {
+		c->y += c->incr;
+		c->err -= c->dx;
+	}
+}
+
+static void cursor_walk23(struct cursor *c)
+{
+	c->y++;
+	c->err += c->dx;
+	if (2*c->err >= c->dy) {
+		c->x += c->incr;
+		c->err -= c->dy;
+	}
+}
+
+static void cursor_walk45(struct cursor *c)
+{
+	c->x--;
+	c->err += c->dy;
+	if (2*c->err >= c->dx) {
+		c->y += c->incr;
+		c->err -= c->dx;
+	}
+}
+
+static void cursor_walk67(struct cursor *c)
+{
+	c->y--;
+	c->err += c->dx;
+	if (2*c->err >= c->dy) {
+		c->x += c->incr;
+		c->err -= c->dy;
+	}
+}
+
+// given two points p0 and p1, initialize cursor to walk from p0 to p1
+static void cursor_init(struct cursor *cur, int x0, int y0, int x1, int y1)
+{
+	int dx = abs(x1 - x0);
+	int dy = abs(y1 - y0);
+
+	if (x0 < x1) {
+		if (dx >= dy) {
+			cur->walk_fn = cursor_walk81;
+			cur->incr = (y0 < y1) ? 1 : -1;
+		} else {
+			if (y0 < y1)
+				cur->walk_fn = cursor_walk23;
+			else
+				cur->walk_fn = cursor_walk67;
+			cur->incr = 1;
+		}
+	} else {
+		if (dx >= dy) {
+			cur->walk_fn = cursor_walk45;
+			cur->incr = (y0 < y1) ? 1 : -1;
+		} else {
+			if (y0 < y1)
+				cur->walk_fn = cursor_walk23;
+			else
+				cur->walk_fn = cursor_walk67;
+			cur->incr = -1;
+		}
+	}
+
+	cur->x = x0;
+	cur->y = y0;
+	cur->x1 = x1;
+	cur->y1 = y1;
+	cur->dx = dx;
+	cur->dy = dy;
+	cur->err = 0;
+}
+
+static inline void cursor_update(struct cursor *cur)
+{
+	cur->walk_fn(cur);
+}
+
+static void raster_triangle(const vec3 v)
+{
+	int tx[3], ty[3];
+	int i, j;
+	int x, y;
+	struct cursor cur0, cur1;
 
 	memcpy(tribuf[tripos++], v, sizeof(vec3));
 	if (tripos < 3)
 		return;
-
 	tripos = 0;
 
-	// if entire triangle is out of clipping zone, do nothing
-	if (!is_visible(tribuf[0]) &&
-	    !is_visible(tribuf[1]) &&
-	    !is_visible(tribuf[2]))
-		return;
+	clip_to_screen(tribuf[0], tx+0, ty+0);
+	clip_to_screen(tribuf[1], tx+1, ty+1);
+	clip_to_screen(tribuf[2], tx+2, ty+2);
 
-	clip_to_screen(tribuf[0], &x1, &y1);
-	clip_to_screen(tribuf[1], &x2, &y2);
-	clip_to_screen(tribuf[2], &x3, &y3);
+	// sort by ascending Y
+	for (i = 0; i < 2; i++) {
+		for (j = 0; j < 2; j++) {
+			if (ty[j+1] < ty[j]) {
+				swap2i(tx+j, tx+j+1);
+				swap2i(ty+j, ty+j+1);
+			}
+		}
+	}
 
-	minx = min(x1, min(x2, x3));
-	maxx = max(x1, max(x2, x3));
-	miny = min(y1, min(y2, y3));
-	maxy = max(y1, max(y2, y3));
+	// sort by ascending X (when Y is the same)
+	for (i = 0; i < 2; i++) {
+		for (j = 0; j < 2; j++) {
+			if (ty[j+1] == ty[j] && tx[j+1] < tx[j]) {
+				swap2i(tx+j, tx+j+1);
+				swap2i(ty+j, ty+j+1);
+			}
+		}
+	}
 
-	// rasterize triangle
-	for (y = miny; y <= maxy; y++) {
-		for (x = minx; x <= maxx; x++) {
-			if (point_in_triangle_2i(x, y, x1, y1, x2, y2, x3, y3))
-				gl_raster_point(x, y);
+	// cur0 walks from A to B
+	// cur1 walks from A to C
+	cursor_init(&cur0, tx[0], ty[0], tx[1], ty[1]);
+	cursor_init(&cur1, tx[0], ty[0], tx[2], ty[2]);
+
+	for (y = ty[0]; y <= ty[2]; y++) {
+		int x0, x1;
+		int prev;
+
+		if (y == ty[1]) {
+			// cur0 walks from B to C
+			cursor_init(&cur0, tx[1], ty[1], tx[2], ty[2]);
+		}
+
+		x0 = min(cur0.x, cur1.x);
+		x1 = max(cur0.x, cur1.x);
+
+		// fill line between cur0 and cur1
+		for (x = x0; x <= x1; x++) {
+			gl_raster_point(x, y);
+		}
+
+		prev = cur0.y;
+		cursor_update(&cur0);
+		if (cur0.y != cur0.y1) {
+			while (prev == cur0.y)
+				cursor_update(&cur0);
+		}
+
+		prev = cur1.y;
+		cursor_update(&cur1);
+		if (cur1.y != cur1.y1) {
+			while (prev == cur1.y)
+				cursor_update(&cur1);
 		}
 	}
 }
