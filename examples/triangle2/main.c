@@ -14,14 +14,36 @@
 
 float camx = 0.0f;
 float camy = 0.0f;
-float camz = 1.0f;
+float camz = 5.0f;
 
 static void draw_tri(void)
 {
 	glBegin(GL_TRIANGLES);
-	glVertex3f(-1.0f, -1.0f, 0.0f);
-	glVertex3f( 1.0f, -1.0f, 0.0f);
-	glVertex3f( 0.0f,  1.0f, 0.0f);
+
+	// front
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f( 0.0f, 1.0f, 0.0f);
+	glVertex3f(-1.0f,-1.0f, 1.0f);
+	glVertex3f( 1.0f,-1.0f, 1.0f);
+
+	// back
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f( 0.0f, 1.0f, 0.0f);
+	glVertex3f(-1.0f,-1.0f,-1.0f);
+	glVertex3f( 1.0f,-1.0f,-1.0f);
+
+	// left
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f( 0.0f, 1.0f, 0.0f);
+	glVertex3f(-1.0f,-1.0f,-1.0f);
+	glVertex3f(-1.0f,-1.0f, 1.0f);
+
+	// right
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glVertex3f( 0.0f, 1.0f, 0.0f);
+	glVertex3f( 1.0f,-1.0f,-1.0f);
+	glVertex3f( 1.0f,-1.0f, 1.0f);
+
 	glEnd();
 }
 
@@ -29,7 +51,7 @@ void display(void)
 {
 	static int angle = 0;
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
 
@@ -66,7 +88,7 @@ void resize(int w, int h)
 int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
 
 	glutInitWindowSize(640, 480);
 	glutInitWindowPosition(300, 200);
@@ -76,6 +98,10 @@ int main(int argc, char *argv[])
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
 
+#ifndef __MUKAGL__
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+#endif
 	glutMainLoop();
 
 	return 0;
