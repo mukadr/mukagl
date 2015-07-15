@@ -40,7 +40,7 @@ void display(void)
 
 	glTranslatef(-3.0f, 0.0f, -4.0f);
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-	glColor3f(0.8f, 0.2f, 0.2f);
+	glColor3f(1.0f, 0.0f, 0.0f);
 
 	draw_tri();
 
@@ -50,7 +50,7 @@ void display(void)
 
 	glTranslatef(-1.0f, 0.0f, -2.0f);
 	glRotatef(angle, 0.0f, 0.0f, 1.0f);
-	glColor3f(0.8f, 0.7f, 0.0f);
+	glColor3f(0.0f, 1.0f, 0.0f);
 
 	draw_tri();
 
@@ -59,7 +59,7 @@ void display(void)
 
 	glTranslatef(1.0f, 0.0f, 0.0f);
 	glRotatef(angle, 1.0f, 0.0f, 0.0f);
-	glColor3f(0.2f, 0.2f, 0.8f);
+	glColor3f(0.0f, 0.0f, 1.0f);
 
 	draw_tri();
 
