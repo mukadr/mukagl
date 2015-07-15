@@ -30,6 +30,10 @@ static inline int gl_view_height(void)
 // Rasterization
 static inline void gl_raster_point(int x, int y)
 {
+	if (x < 0 || x >= sdl.w)
+		return;
+	if (y < 0 || y >= sdl.h)
+		return;
 	sdl.framebuf[x + y*sdl.w] = sdl.color;
 }
 
