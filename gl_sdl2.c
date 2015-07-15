@@ -31,7 +31,7 @@ void gl_color(float r, float g, float b, float a)
 	Uint32 bi = (Uint32)(b * 255);
 	Uint32 ai = (Uint32)(a * 255);
 
-	sdl.color = (ai << 24) | (bi << 16) | (gi << 8) | ri;
+	sdl.color = (ai << 24) | (ri << 16) | (gi << 8) | bi;
 }
 
 void gl_clear_color(float r, float g, float b, float a)
@@ -41,7 +41,7 @@ void gl_clear_color(float r, float g, float b, float a)
 	Uint32 bi = (Uint32)(b * 255);
 	Uint32 ai = (Uint32)(a * 255);
 
-	sdl.clear_color = (ai << 24) | (bi << 16) | (gi << 8) | ri;
+	sdl.clear_color = (ai << 24) | (ri << 16) | (gi << 8) | bi;
 }
 
 void gl_clear_color_buffer(void)
