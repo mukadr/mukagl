@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
 #ifndef __MUKAGL__
 	glDisable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 #endif
 	glutMainLoop();
 
