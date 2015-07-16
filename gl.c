@@ -269,6 +269,20 @@ static void raster_triangle(const vec3 v)
 		return;
 	tripos = 0;
 
+	// Do not raster triangles outside view frustrum
+	if (tribuf[0][0] > 1.0f && tribuf[1][0] > 1.0f && tribuf[2][0] > 1.0f) // right
+		return;
+	if (tribuf[0][0] < -1.0f && tribuf[1][0] < -1.0f && tribuf[2][0] < -1.0f) // left
+		return;
+	if (tribuf[0][1] > 1.0f && tribuf[1][1] > 1.0f && tribuf[2][1] > 1.0f) // top
+		return;
+	if (tribuf[0][1] < -1.0f && tribuf[1][1] < -1.0f && tribuf[2][1] < -1.0f) // bottom
+		return;
+	if (tribuf[0][2] > 1.0f && tribuf[1][2] > 1.0f && tribuf[2][2] > 1.0f) // after
+		return;
+	if (tribuf[0][2] < -1.0f && tribuf[1][2] < -1.0f && tribuf[2][2] < -1.0f) // before
+		return;
+
 	clip_to_screen(tribuf[0], tx+0, ty+0);
 	clip_to_screen(tribuf[1], tx+1, ty+1);
 	clip_to_screen(tribuf[2], tx+2, ty+2);
