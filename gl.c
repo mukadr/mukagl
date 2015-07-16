@@ -357,9 +357,8 @@ void glVertex3f(float x, float y, float z)
 
 	mat44_mul_vec4(transform, a);
 
-	// Avoid division by zero (near clip should always be greater than this)
-	if (a[3] < 0.0001f)
-		return;
+	if (a[3] < 0.1f)
+		a[3] = 0.1f;
 
 	// w division
 	b[0] = a[0]/a[3];
