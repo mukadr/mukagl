@@ -78,11 +78,25 @@ void resize(int w, int h)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0f, (float)w/h, 0.1f, 10.0f);
+	gluPerspective(60.0f, (float)w/h, 1.0f, 10.0f);
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case 'w':
+	case 'W':
+		camz -= 0.1f;
+		break;
+	case 's':
+	case 'S':
+		camz += 0.1f;
+		break;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -97,10 +111,12 @@ int main(int argc, char *argv[])
 	glutReshapeFunc(resize);
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
+	glutKeyboardFunc(keyboard);
+
+	glEnable(GL_DEPTH_TEST);
 
 #ifndef __MUKAGL__
 	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
 #endif
 	glutMainLoop();
 
