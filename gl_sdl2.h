@@ -39,7 +39,7 @@ static inline void gl_raster_point(int x, int y, float z)
 		return;
 
 	if (sdl.caps & GL_DEPTH_TEST) {
-		if (sdl.depthbuf[x + y*sdl.w] < z)
+		if (sdl.depthbuf[x + y*sdl.w] <= z)
 			return;
 		sdl.depthbuf[x + y*sdl.w] = z;
 	}
