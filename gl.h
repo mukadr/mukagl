@@ -16,6 +16,10 @@
 #define GL_DEPTH_BUFFER_BIT	2
 
 
+// Capabilities
+#define GL_DEPTH_TEST		1
+
+
 // Transformation
 void	glMatrixMode(int mode);
 
@@ -39,6 +43,8 @@ void	glVertex3f(float x, float y, float z);
 
 
 // Miscellaneous
+void	glEnable(int cap);
+void	glDisable(int cap);
 void	glClear(int opts);
 void	glClearColor(float r, float g, float b, float a);
 void	glColor3f(float r, float g, float b);

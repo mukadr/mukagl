@@ -10,6 +10,7 @@
 #include "matrix.h"
 #include "vector.h"
 
+#include "gl.h"
 #include "gl_sdl2.h"
 
 struct gl_sdl2 sdl = {
@@ -50,6 +51,19 @@ void gl_clear_color_buffer(void)
 
 	for (i = 0; i < sdl.w * sdl.h; i++)
 		sdl.framebuf[i] = sdl.clear_color;
+}
+
+void gl_clear_depth_buffer(void)
+{
+	int i;
+
+	if (!(sdl.mode & GLUT_DEPTH)) {
+		fprintf(stderr, "gl_sdl2: Trying to clear non initialized depth buffer\n");
+		return;
+	}
+
+	for (i = 0; i < sdl.w * sdl.h; i++)
+		sdl.depthbuf[i] = INFINITY;
 }
 
 void glutDisplayFunc(void (*func)(void))
@@ -130,7 +144,7 @@ void glutInitWindowPosition(int x, int y)
 
 void glutInitDisplayMode(int mode)
 {
-	// empty
+	sdl.mode = mode;
 }
 
 void glutCreateWindow(const char *title)
@@ -151,6 +165,14 @@ void glutCreateWindow(const char *title)
 	if (!sdl.framebuf) {
 		fprintf(stderr, "gl_sdl2: out of memory\n");
 		exit(1);
+	}
+
+	if (sdl.mode & GLUT_DEPTH) {
+		sdl.depthbuf = malloc(sdl.w * sdl.h * sizeof(float));
+		if (!sdl.depthbuf) {
+			fprintf(stderr, "gl_sdl2: out of memory\n");
+			exit(1);
+		}
 	}
 
 	sdl.videobuf = SDL_CreateTexture(sdl.renderer, SDL_PIXELFORMAT_ARGB8888,

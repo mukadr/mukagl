@@ -112,9 +112,34 @@ void gluPerspective(float fovy, float aspect, float near, float far)
 	matp->mat[3][3] = 0.0f;
 }
 
+void glEnable(int cap)
+{
+	switch (cap) {
+	case GL_DEPTH_TEST:
+		if (!(sdl.mode & GLUT_DEPTH)) {
+			fprintf(stderr, "gl: GLUT_DEPTH must be specified during glutInit in order to enable buffer\n");
+			break;
+		}
+		sdl.caps |= GL_DEPTH_TEST;
+		break;
+	}
+}
+
+void glDisable(int cap)
+{
+	switch (cap) {
+	case GL_DEPTH_TEST:
+		sdl.caps &= ~GL_DEPTH_TEST;
+		break;
+	}
+}
+
 void glClear(int opts)
 {
-	gl_clear_color_buffer();
+	if (opts & GL_COLOR_BUFFER_BIT)
+		gl_clear_color_buffer();
+	if (opts & GL_DEPTH_BUFFER_BIT)
+		gl_clear_depth_buffer();
 }
 
 void glClearColor(float r, float g, float b, float a)
@@ -164,12 +189,21 @@ static inline void swap2i(int *a, int *b)
 	*b = tmp;
 }
 
+static inline void swap2f(float *a, float *b)
+{
+	float tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
 struct cursor {
 	int x, y;
 	int x1, y1;
 	int dx, dy;
 	int err;
 	int incr;
+	float z;
+	float zstep;
 	void (*walk_fn)(struct cursor *);
 };
 
@@ -214,32 +248,37 @@ static void cursor_walk67(struct cursor *c)
 }
 
 // given two points p0 and p1, initialize cursor to walk from p0 to p1
-static void cursor_init(struct cursor *cur, int x0, int y0, int x1, int y1)
+static void cursor_init(struct cursor *cur, int x0, int y0, float z0, int x1, int y1, float z1)
 {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
+	int steps;
 
 	if (x0 < x1) {
 		if (dx >= dy) {
 			cur->walk_fn = cursor_walk81;
 			cur->incr = (y0 < y1) ? 1 : -1;
+			steps = dx;
 		} else {
 			if (y0 < y1)
 				cur->walk_fn = cursor_walk23;
 			else
 				cur->walk_fn = cursor_walk67;
 			cur->incr = 1;
+			steps = dy;
 		}
 	} else {
 		if (dx >= dy) {
 			cur->walk_fn = cursor_walk45;
 			cur->incr = (y0 < y1) ? 1 : -1;
+			steps = dx;
 		} else {
 			if (y0 < y1)
 				cur->walk_fn = cursor_walk23;
 			else
 				cur->walk_fn = cursor_walk67;
 			cur->incr = -1;
+			steps = dy;
 		}
 	}
 
@@ -250,16 +289,20 @@ static void cursor_init(struct cursor *cur, int x0, int y0, int x1, int y1)
 	cur->dx = dx;
 	cur->dy = dy;
 	cur->err = 0;
+	cur->z = z0;
+	cur->zstep = (z1 - z0)/steps; // linear interpolation of Z coord
 }
 
 static inline void cursor_update(struct cursor *cur)
 {
 	cur->walk_fn(cur);
+	cur->z += cur->zstep;
 }
 
 static void raster_triangle(const vec3 v)
 {
 	int tx[3], ty[3];
+	float tz[3];
 	int i, j;
 	int x, y;
 	struct cursor cur0, cur1;
@@ -287,12 +330,16 @@ static void raster_triangle(const vec3 v)
 	clip_to_screen(tribuf[1], tx+1, ty+1);
 	clip_to_screen(tribuf[2], tx+2, ty+2);
 
+	for (i = 0; i < 3; i++)
+		tz[i] = tribuf[i][2];
+
 	// sort by ascending Y
 	for (i = 0; i < 2; i++) {
 		for (j = 0; j < 2; j++) {
 			if (ty[j+1] < ty[j]) {
 				swap2i(tx+j, tx+j+1);
 				swap2i(ty+j, ty+j+1);
+				swap2f(tz+j, tz+j+1);
 			}
 		}
 	}
@@ -303,30 +350,39 @@ static void raster_triangle(const vec3 v)
 			if (ty[j+1] == ty[j] && tx[j+1] < tx[j]) {
 				swap2i(tx+j, tx+j+1);
 				swap2i(ty+j, ty+j+1);
+				swap2f(tz+j, tz+j+1);
 			}
 		}
 	}
 
 	// cur0 walks from A to B
 	// cur1 walks from A to C
-	cursor_init(&cur0, tx[0], ty[0], tx[1], ty[1]);
-	cursor_init(&cur1, tx[0], ty[0], tx[2], ty[2]);
+	cursor_init(&cur0, tx[0], ty[0], tz[0], tx[1], ty[1], tz[1]);
+	cursor_init(&cur1, tx[0], ty[0], tz[0], tx[2], ty[2], tz[2]);
 
 	for (y = ty[0]; y <= ty[2]; y++) {
 		int x0, x1;
+		float z, zstep;
 		int prev;
 
 		if (y == ty[1]) {
 			// cur0 walks from B to C
-			cursor_init(&cur0, tx[1], ty[1], tx[2], ty[2]);
+			cursor_init(&cur0, tx[1], ty[1], tz[1], tx[2], ty[2], tz[2]);
 		}
 
 		x0 = min(cur0.x, cur1.x);
 		x1 = max(cur0.x, cur1.x);
 
+		zstep = (cur1.z - cur0.z)/(x1 - x0);
+
 		// fill line between cur0 and cur1
-		for (x = x0; x <= x1; x++) {
+		for (x = x0, z = cur0.z; x <= x1; x++) {
+			if ((sdl.caps & GL_DEPTH_TEST) && !gl_depth_test(x, y, z)) {
+				z += zstep;
+				continue;
+			}
 			gl_raster_point(x, y);
+			z += zstep;
 		}
 
 		prev = cur0.y;
