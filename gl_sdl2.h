@@ -31,27 +31,20 @@ static inline int gl_view_height(void)
 
 
 // Rasterization
-static inline void gl_raster_point(int x, int y)
+static inline void gl_raster_point(int x, int y, float z)
 {
 	if (x < 0 || x >= sdl.w)
 		return;
 	if (y < 0 || y >= sdl.h)
 		return;
+
+	if (sdl.caps & GL_DEPTH_TEST) {
+		if (sdl.depthbuf[x + y*sdl.w] < z)
+			return;
+		sdl.depthbuf[x + y*sdl.w] = z;
+	}
+
 	sdl.framebuf[x + y*sdl.w] = sdl.color;
-}
-
-static inline int gl_depth_test(int x, int y, float z)
-{
-	if (x < 0 || x >= sdl.w)
-		return 0;
-	if (y < 0 || y >= sdl.h)
-		return 0;
-
-	if (sdl.depthbuf[x + y*sdl.w] < z)
-		return 0;
-
-	sdl.depthbuf[x + y*sdl.w] = z;
-	return 1;
 }
 
 void	gl_clear_color_buffer(void);

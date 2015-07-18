@@ -176,7 +176,7 @@ void raster_point(const vec3 v)
 		return;
 
 	clip_to_screen(v, &x, &y);
-	gl_raster_point(x, y);
+	gl_raster_point(x, y, v[2]);
 }
 
 static vec3 tribuf[3];
@@ -377,11 +377,7 @@ static void raster_triangle(const vec3 v)
 
 		// fill line between cur0 and cur1
 		for (x = x0, z = cur0.z; x <= x1; x++) {
-			if ((sdl.caps & GL_DEPTH_TEST) && !gl_depth_test(x, y, z)) {
-				z += zstep;
-				continue;
-			}
-			gl_raster_point(x, y);
+			gl_raster_point(x, y, z);
 			z += zstep;
 		}
 
