@@ -95,6 +95,7 @@ void glPopMatrix(void)
 
 	matp->pos--;
 	memcpy(matp->mat, matp->stack[matp->pos], sizeof(mat44));
+	update_transform();
 }
 
 void gluPerspective(float fovy, float aspect, float near, float far)
