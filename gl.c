@@ -363,7 +363,7 @@ static void raster_triangle(const vec3 v)
 
 	for (y = ty[0]; y <= ty[2]; y++) {
 		int x0, x1;
-		float z, zstep;
+		float z, z0, z1, zstep;
 		int prev;
 
 		if (y == ty[1]) {
@@ -371,13 +371,22 @@ static void raster_triangle(const vec3 v)
 			cursor_init(&cur0, tx[1], ty[1], tz[1], tx[2], ty[2], tz[2]);
 		}
 
-		x0 = min(cur0.x, cur1.x);
-		x1 = max(cur0.x, cur1.x);
+		if (cur0.x < cur1.x) {
+			x0 = cur0.x;
+			z0 = cur0.z;
+			x1 = cur1.x;
+			z1 = cur1.z;
+		} else {
+			x0 = cur1.x;
+			z0 = cur1.z;
+			x1 = cur0.x;
+			z1 = cur0.z;
+		}
 
-		zstep = (cur1.z - cur0.z)/(x1 - x0);
+		zstep = (z1 - z0)/(x1 - x0);
 
 		// fill line between cur0 and cur1
-		for (x = x0, z = cur0.z; x <= x1; x++) {
+		for (x = x0, z = z0; x <= x1; x++) {
 			gl_raster_point(x, y, z);
 			z += zstep;
 		}
