@@ -290,8 +290,8 @@ static void cursor_init(struct cursor *cur, int x0, int y0, float z0, int x1, in
 	cur->dx = dx;
 	cur->dy = dy;
 	cur->err = 0;
-	cur->z = z0;
-	cur->zstep = (z1 - z0)/steps; // linear interpolation of Z coord
+	cur->zstep = (z1 - z0)/(steps + 2); // linear interpolation of Z coord
+	cur->z = z0 + cur->zstep;
 }
 
 static inline void cursor_update(struct cursor *cur)
@@ -383,12 +383,12 @@ static void raster_triangle(const vec3 v)
 			z1 = cur0.z;
 		}
 
-		zstep = (z1 - z0)/(x1 - x0);
+		zstep = (z1 - z0)/(x1 - x0 + 2);
 
 		// fill line between cur0 and cur1
 		for (x = x0, z = z0; x <= x1; x++) {
-			gl_raster_point(x, y, z);
 			z += zstep;
+			gl_raster_point(x, y, z);
 		}
 
 		prev = cur0.y;
