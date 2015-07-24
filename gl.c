@@ -39,6 +39,8 @@ struct texinfo {
 	int used;
 };
 
+static GLuint texnr;
+
 #define TEXTURE_MAX 1024
 
 static struct texinfo textures[TEXTURE_MAX];
@@ -475,6 +477,15 @@ void glGenTextures(GLsizei n, GLuint *texture)
 
 void glBindTexture(GLenum target, GLuint texture)
 {
+	if (target != GL_TEXTURE_2D) {
+		fprintf(stderr, "glBindTexture: Only GL_TEXTURE_2D supported\n");
+		return;
+	}
+	if (texture >= TEXTURE_MAX || !textures[texture].used) {
+		fprintf(stderr, "gl: Invalid texture id\n");
+		exit(1);
+	}
+	texnr = texture;
 }
 
 void glTexParameteri(GLenum target, GLenum pname, GLint param)
