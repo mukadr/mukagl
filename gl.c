@@ -34,6 +34,15 @@ static mat44 transform;
 // selected primitive (GL_POINTS, GL_TRIANGLES...)
 static void (*primitive_fn)(const vec3 v);
 
+// textures
+struct texinfo {
+	int used;
+};
+
+#define TEXTURE_MAX 1024
+
+static struct texinfo textures[TEXTURE_MAX];
+
 static void update_transform(void)
 {
 	mat44_identity(transform);
@@ -448,6 +457,20 @@ void glVertex3f(float x, float y, float z)
 
 void glGenTextures(GLsizei n, GLuint *texture)
 {
+	GLuint idx = 0;
+
+	while (n > 0) {
+		while (textures[idx].used) {
+			idx++;
+			if (idx == TEXTURE_MAX) {
+				fprintf(stderr, "glGenTextures: Too many textures\n");
+				exit(1);
+			}
+		}
+		textures[idx].used = 1;
+		*texture++ = idx;
+		n--;
+	}
 }
 
 void glBindTexture(GLenum target, GLuint texture)
