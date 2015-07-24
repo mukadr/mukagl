@@ -59,6 +59,7 @@ void glTranslatef(float x, float y, float z)
 	update_transform();
 }
 
+// FIXME: glRotatef should rotate around vector [x,y,z]
 void glRotatef(float angle, float x, float y, float z)
 {
 	mat44_rotx(matp->mat, x * angle);
@@ -443,4 +444,34 @@ void glVertex3f(float x, float y, float z)
 
 	if (primitive_fn)
 		primitive_fn(b);
+}
+
+void glGenTextures(GLsizei n, GLuint *texture)
+{
+}
+
+void glBindTexture(GLenum target, GLuint texture)
+{
+}
+
+void glTexParameteri(GLenum target, GLenum pname, GLint param)
+{
+}
+
+void glPixelStorei(GLenum pname, GLint param)
+{
+}
+
+void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
+		     GLsizei width, GLsizei height, GLint border, GLenum format,
+		     GLenum type, const GLvoid *pixels)
+{
+}
+
+void glTexEnvf(GLenum target, GLenum pname, GLfloat param)
+{
+}
+
+void glTexCoord2f(GLfloat s, GLfloat t)
+{
 }

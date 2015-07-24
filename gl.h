@@ -1,6 +1,19 @@
 #ifndef MUKAGL_GL_H
 #define MUKAGL_GL_H
 
+// Data types
+typedef void			GLvoid;
+typedef unsigned int		GLenum;
+typedef unsigned int		GLuint;
+typedef int			GLint;
+typedef int			GLsizei;
+typedef float			GLfloat;
+
+
+// Data types constants
+#define GL_UNSIGNED_BYTE	1
+
+
 // Matrix Mode
 #define GL_MODELVIEW		0
 #define GL_PROJECTION		1
@@ -18,6 +31,25 @@
 
 // Capabilities
 #define GL_DEPTH_TEST		1
+
+
+// Texture mapping
+#define GL_TEXTURE_2D		1
+#define GL_TEXTURE_MIN_FILTER	2
+#define GL_TEXTURE_MAG_FILTER	3
+#define GL_NEAREST		4
+#define GL_TEXTURE_ENV		5
+#define GL_TEXTURE_ENV_MODE	6
+#define GL_DECAL		7
+
+
+// Pixel drawing
+#define GL_RGB			1
+#define GL_RGBA			2
+
+
+// Pixel mode
+#define GL_UNPACK_ALIGNMENT	1
 
 
 // Transformation
@@ -48,6 +80,18 @@ void	glDisable(int cap);
 void	glClear(int opts);
 void	glClearColor(float r, float g, float b, float a);
 void	glColor3f(float r, float g, float b);
+
+
+// Textures
+void	glGenTextures(GLsizei n, GLuint *texture);
+void	glBindTexture(GLenum target, GLuint texture);
+void	glTexParameteri(GLenum target, GLenum pname, GLint param);
+void	glPixelStorei(GLenum pname, GLint param);
+void	glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
+		     GLsizei width, GLsizei height, GLint border, GLenum format,
+		     GLenum type, const GLvoid *pixels);
+void	glTexEnvf(GLenum target, GLenum pname, GLfloat param);
+void	glTexCoord2f(GLfloat s, GLfloat t);
 
 
 // GLUT
