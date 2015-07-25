@@ -16,6 +16,7 @@ extern struct gl_sdl2 {
 	int quit;
 	Uint32 color;
 	Uint32 clear_color;
+	int unpack_align;
 } sdl;
 
 // Viewport

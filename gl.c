@@ -509,6 +509,11 @@ void glTexParameteri(GLenum target, GLenum pname, GLint param)
 
 void glPixelStorei(GLenum pname, GLint param)
 {
+	if (pname != GL_UNPACK_ALIGNMENT) {
+		fprintf(stderr, "glPixelStorei: Unsupported parameter %d\n", pname);
+		return;
+	}
+	sdl.unpack_align = param;
 }
 
 void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
