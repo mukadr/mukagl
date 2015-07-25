@@ -37,6 +37,8 @@ static void (*primitive_fn)(const vec3 v);
 // textures
 struct texinfo {
 	int used;
+	int min_filter;
+	int mag_filter;
 };
 
 static GLuint texnr;
@@ -490,6 +492,19 @@ void glBindTexture(GLenum target, GLuint texture)
 
 void glTexParameteri(GLenum target, GLenum pname, GLint param)
 {
+	struct texinfo *ti = &textures[texnr];
+
+	switch (pname) {
+	case GL_TEXTURE_MIN_FILTER:
+		ti->min_filter = param;
+		break;
+	case GL_TEXTURE_MAG_FILTER:
+		ti->mag_filter = param;
+		break;
+	default:
+		fprintf(stderr, "gl: glTexParameteri: Unsupported parameter %d\n", pname);
+		break;
+	}
 }
 
 void glPixelStorei(GLenum pname, GLint param)
