@@ -39,6 +39,7 @@ struct texinfo {
 	int used;
 	int min_filter;
 	int mag_filter;
+	char *data;
 };
 
 static GLuint texnr;
@@ -520,6 +521,56 @@ void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
 		     GLsizei width, GLsizei height, GLint border, GLenum format,
 		     GLenum type, const GLvoid *pixels)
 {
+	struct texinfo *ti = &textures[texnr];
+	const char *src = pixels;
+	char *dst;
+	GLsizei h;
+
+	if (target != GL_TEXTURE_2D) {
+		fprintf(stderr, "glTexImage2D: Only GL_TEXTURE_2D supported\n");
+		return;
+	}
+
+	if (level != 0) {
+		fprintf(stderr, "glTexImage2D: Mipmap not supported\n");
+		return;
+	}
+
+	if (internal_fmt != GL_RGB || format != GL_RGB) {
+		fprintf(stderr, "glTexImage2D: Only GL_RGB supported\n");
+		return;
+	}
+
+	if (border != 0) {
+		fprintf(stderr, "glTexImage2D: No border support\n");
+		return;
+	}
+
+	if (type != GL_UNSIGNED_BYTE) {
+		fprintf(stderr, "glTexImage2D: Only GL_UNSIGNED_BYTE supported\n");
+		return;
+	}
+
+	if (width <= 0 || height <= 0) {
+		fprintf(stderr, "glTexImage2D: Invalid image size\n");
+	}
+
+	ti->data = malloc(width * height * 3);
+	if (!ti->data) {
+		fprintf(stderr, "glTexImage2D: Out of memory\n");
+		exit(1);
+	}
+
+	dst = ti->data;
+	for (h = 0; h < height; h++) {
+		// align to next row of pixels
+		src = (const char *)(((uintptr_t)src + sdl.unpack_align - 1) & ~(sdl.unpack_align - 1));
+
+		memcpy(dst, src, width * 3);
+
+		dst += width * 3;
+		src += width * 3;
+	}
 }
 
 void glTexEnvf(GLenum target, GLenum pname, GLfloat param)
