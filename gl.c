@@ -195,8 +195,14 @@ void raster_point(const vec3 v)
 	gl_raster_point(x, y, v[2]);
 }
 
-static vec3 tribuf[3];
+struct vecinfo {
+	vec3 v;
+	float s, t;
+};
+
+static struct vecinfo tribuf[3];
 static int tripos;
+static float scoord, tcoord;
 
 static inline void swap2i(int *a, int *b)
 {
@@ -323,31 +329,34 @@ static void raster_triangle(const vec3 v)
 	int x, y;
 	struct cursor cur0, cur1;
 
-	memcpy(tribuf[tripos++], v, sizeof(vec3));
+	memcpy(tribuf[tripos].v, v, sizeof(vec3));
+	tribuf[tripos].s = scoord;
+	tribuf[tripos].t = tcoord;
+	tripos++;
 	if (tripos < 3)
 		return;
 	tripos = 0;
 
 	// Do not raster triangles outside view frustrum
-	if (tribuf[0][0] > 1.0f && tribuf[1][0] > 1.0f && tribuf[2][0] > 1.0f) // right
+	if (tribuf[0].v[0] > 1.0f && tribuf[1].v[0] > 1.0f && tribuf[2].v[0] > 1.0f) // right
 		return;
-	if (tribuf[0][0] < -1.0f && tribuf[1][0] < -1.0f && tribuf[2][0] < -1.0f) // left
+	if (tribuf[0].v[0] < -1.0f && tribuf[1].v[0] < -1.0f && tribuf[2].v[0] < -1.0f) // left
 		return;
-	if (tribuf[0][1] > 1.0f && tribuf[1][1] > 1.0f && tribuf[2][1] > 1.0f) // top
+	if (tribuf[0].v[1] > 1.0f && tribuf[1].v[1] > 1.0f && tribuf[2].v[1] > 1.0f) // top
 		return;
-	if (tribuf[0][1] < -1.0f && tribuf[1][1] < -1.0f && tribuf[2][1] < -1.0f) // bottom
+	if (tribuf[0].v[1] < -1.0f && tribuf[1].v[1] < -1.0f && tribuf[2].v[1] < -1.0f) // bottom
 		return;
-	if (tribuf[0][2] > 1.0f && tribuf[1][2] > 1.0f && tribuf[2][2] > 1.0f) // after
+	if (tribuf[0].v[2] > 1.0f && tribuf[1].v[2] > 1.0f && tribuf[2].v[2] > 1.0f) // after
 		return;
-	if (tribuf[0][2] < -1.0f && tribuf[1][2] < -1.0f && tribuf[2][2] < -1.0f) // before
+	if (tribuf[0].v[2] < -1.0f && tribuf[1].v[2] < -1.0f && tribuf[2].v[2] < -1.0f) // before
 		return;
 
-	clip_to_screen(tribuf[0], tx+0, ty+0);
-	clip_to_screen(tribuf[1], tx+1, ty+1);
-	clip_to_screen(tribuf[2], tx+2, ty+2);
+	clip_to_screen(tribuf[0].v, tx+0, ty+0);
+	clip_to_screen(tribuf[1].v, tx+1, ty+1);
+	clip_to_screen(tribuf[2].v, tx+2, ty+2);
 
 	for (i = 0; i < 3; i++)
-		tz[i] = tribuf[i][2];
+		tz[i] = tribuf[i].v[2];
 
 	// sort by ascending Y
 	for (i = 0; i < 2; i++) {
@@ -579,4 +588,6 @@ void glTexEnvf(GLenum target, GLenum pname, GLfloat param)
 
 void glTexCoord2f(GLfloat s, GLfloat t)
 {
+	scoord = s;
+	tcoord = t;
 }
