@@ -1,0 +1,3 @@
+fix glitches..
+rasterization: implement clipping
+texture mapping: add support for GL_REPEAT (to fix nehe/lesson10)
