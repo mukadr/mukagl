@@ -448,7 +448,7 @@ static void raster_triangle(const vec3 v)
 		t = t0;
 
 		// fill line between cur0 and cur1
-		for (x = x0, z = z0; x <= x1; x++) {
+		for (x = x0; x <= x1; x++) {
 			Uint32 texel;
 			z += zstep;
 			if (texflag) {
