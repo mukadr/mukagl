@@ -111,8 +111,6 @@ void glutPostRedisplay(void)
 {
 	if (display_func)
 		display_func();
-
-	debug_fps();
 }
 
 void glutSwapBuffers(void)
@@ -120,6 +118,8 @@ void glutSwapBuffers(void)
 	SDL_UpdateTexture(sdl.videobuf, NULL, sdl.framebuf, sdl.w * 4);
 	SDL_RenderCopy(sdl.renderer, sdl.videobuf, NULL, NULL);
 	SDL_RenderPresent(sdl.renderer);
+
+	debug_fps();
 }
 
 void glutInit(int *pargc, char **argv)
