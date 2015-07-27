@@ -443,8 +443,8 @@ int main(int argc, char **argv)
 	}
 	*/
 	if (!g_gamemode) {
-		glutInitWindowSize(500, 500);	// Window Size If We Start In Windowed Mode
-		glutCreateWindow("NeHe's OpenGL Framework");	// Window Title 
+		glutInitWindowSize(640, 480);	// Window Size If We Start In Windowed Mode
+		glutCreateWindow("NeHe's OpenGL Framework" TITLE_SUFFIX);	// Window Title
 	}
 	if (!init()) {		// Our Initialization
 		fprintf(stderr, "Cannot initialize textures.\n");
