@@ -5,6 +5,7 @@
 typedef void			GLvoid;
 typedef unsigned int		GLenum;
 typedef unsigned int		GLuint;
+typedef unsigned char		GLubyte;
 typedef int			GLint;
 typedef int			GLsizei;
 typedef float			GLfloat;
