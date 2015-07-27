@@ -39,6 +39,7 @@ struct texinfo {
 	int used;
 	int min_filter;
 	int mag_filter;
+	int w, h;
 	char *data;
 };
 
@@ -562,6 +563,7 @@ void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
 
 	if (width <= 0 || height <= 0) {
 		fprintf(stderr, "glTexImage2D: Invalid image size\n");
+		return;
 	}
 
 	ti->data = malloc(width * height * 3);
@@ -580,6 +582,9 @@ void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
 		dst += width * 3;
 		src += width * 3;
 	}
+
+	ti->w = width;
+	ti->h = height;
 }
 
 void glTexEnvf(GLenum target, GLenum pname, GLfloat param)
