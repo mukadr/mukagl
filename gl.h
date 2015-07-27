@@ -34,13 +34,13 @@ typedef float			GLfloat;
 
 
 // Texture mapping
-#define GL_TEXTURE_2D		1
-#define GL_TEXTURE_MIN_FILTER	2
-#define GL_TEXTURE_MAG_FILTER	3
-#define GL_NEAREST		4
-#define GL_TEXTURE_ENV		5
-#define GL_TEXTURE_ENV_MODE	6
-#define GL_DECAL		7
+#define GL_TEXTURE_2D		100
+#define GL_TEXTURE_MIN_FILTER	101
+#define GL_TEXTURE_MAG_FILTER	102
+#define GL_NEAREST		103
+#define GL_TEXTURE_ENV		104
+#define GL_TEXTURE_ENV_MODE	105
+#define GL_DECAL		106
 
 
 // Pixel drawing

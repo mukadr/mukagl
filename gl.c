@@ -40,10 +40,11 @@ struct texinfo {
 	int min_filter;
 	int mag_filter;
 	int w, h;
-	char *data;
+	unsigned char *data;
 };
 
 static GLuint texnr;
+static int texflag;
 
 #define TEXTURE_MAX 1024
 
@@ -139,6 +140,9 @@ void glEnable(int cap)
 		}
 		sdl.caps |= GL_DEPTH_TEST;
 		break;
+	case GL_TEXTURE_2D:
+		texflag = 1;
+		break;
 	}
 }
 
@@ -147,6 +151,9 @@ void glDisable(int cap)
 	switch (cap) {
 	case GL_DEPTH_TEST:
 		sdl.caps &= ~GL_DEPTH_TEST;
+		break;
+	case GL_TEXTURE_2D:
+		texflag = 0;
 		break;
 	}
 }
@@ -193,7 +200,7 @@ void raster_point(const vec3 v)
 		return;
 
 	clip_to_screen(v, &x, &y);
-	gl_raster_point(x, y, v[2]);
+	gl_raster_point(x, y, v[2], sdl.color);
 }
 
 struct vecinfo {
@@ -225,8 +232,8 @@ struct cursor {
 	int dx, dy;
 	int err;
 	int incr;
-	float z;
-	float zstep;
+	float z, s, t;
+	float zstep, sstep, tstep;
 	void (*walk_fn)(struct cursor *);
 };
 
@@ -271,7 +278,8 @@ static void cursor_walk67(struct cursor *c)
 }
 
 // given two points p0 and p1, initialize cursor to walk from p0 to p1
-static void cursor_init(struct cursor *cur, int x0, int y0, float z0, int x1, int y1, float z1)
+static void cursor_init(struct cursor *cur, int x0, int y0, float z0, float s0, float t0,
+			int x1, int y1, float z1, float s1, float t1)
 {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
@@ -314,18 +322,24 @@ static void cursor_init(struct cursor *cur, int x0, int y0, float z0, int x1, in
 	cur->err = 0;
 	cur->zstep = (z1 - z0)/(steps + 2); // linear interpolation of Z coord
 	cur->z = z0 + cur->zstep;
+	cur->sstep = (s1 - s0)/steps;
+	cur->s = s0;
+	cur->tstep = (t1 - t0)/steps;
+	cur->t = t0;
 }
 
 static inline void cursor_update(struct cursor *cur)
 {
 	cur->walk_fn(cur);
 	cur->z += cur->zstep;
+	cur->s += cur->sstep;
+	cur->t += cur->tstep;
 }
 
 static void raster_triangle(const vec3 v)
 {
 	int tx[3], ty[3];
-	float tz[3];
+	float tz[3], ts[3], tt[3];
 	int i, j;
 	int x, y;
 	struct cursor cur0, cur1;
@@ -356,8 +370,11 @@ static void raster_triangle(const vec3 v)
 	clip_to_screen(tribuf[1].v, tx+1, ty+1);
 	clip_to_screen(tribuf[2].v, tx+2, ty+2);
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 3; i++) {
 		tz[i] = tribuf[i].v[2];
+		ts[i] = tribuf[i].s;
+		tt[i] = tribuf[i].t;
+	}
 
 	// sort by ascending Y
 	for (i = 0; i < 2; i++) {
@@ -366,6 +383,8 @@ static void raster_triangle(const vec3 v)
 				swap2i(tx+j, tx+j+1);
 				swap2i(ty+j, ty+j+1);
 				swap2f(tz+j, tz+j+1);
+				swap2f(ts+j, ts+j+1);
+				swap2f(tt+j, tt+j+1);
 			}
 		}
 	}
@@ -377,43 +396,90 @@ static void raster_triangle(const vec3 v)
 				swap2i(tx+j, tx+j+1);
 				swap2i(ty+j, ty+j+1);
 				swap2f(tz+j, tz+j+1);
+				swap2f(ts+j, ts+j+1);
+				swap2f(tt+j, tt+j+1);
 			}
 		}
 	}
 
 	// cur0 walks from A to B
 	// cur1 walks from A to C
-	cursor_init(&cur0, tx[0], ty[0], tz[0], tx[1], ty[1], tz[1]);
-	cursor_init(&cur1, tx[0], ty[0], tz[0], tx[2], ty[2], tz[2]);
+	cursor_init(&cur0, tx[0], ty[0], tz[0], ts[0], tt[0], tx[1], ty[1], tz[1], ts[1], tt[1]);
+	cursor_init(&cur1, tx[0], ty[0], tz[0], ts[0], tt[0], tx[2], ty[2], tz[2], ts[2], tt[2]);
 
 	for (y = ty[0]; y <= ty[2]; y++) {
 		int x0, x1;
 		float z, z0, z1, zstep;
+		float s, s0, s1, sstep;
+		float t, t0, t1, tstep;
 		int prev;
 
 		if (y == ty[1]) {
 			// cur0 walks from B to C
-			cursor_init(&cur0, tx[1], ty[1], tz[1], tx[2], ty[2], tz[2]);
+			cursor_init(&cur0, tx[1], ty[1], tz[1], ts[1], tt[1], tx[2], ty[2], tz[2], ts[2], tt[2]);
 		}
 
 		if (cur0.x < cur1.x) {
 			x0 = cur0.x;
 			z0 = cur0.z;
+			s0 = cur0.s;
+			t0 = cur0.t;
 			x1 = cur1.x;
 			z1 = cur1.z;
+			s1 = cur1.s;
+			t1 = cur1.t;
 		} else {
 			x0 = cur1.x;
 			z0 = cur1.z;
+			s0 = cur1.s;
+			t0 = cur1.t;
 			x1 = cur0.x;
 			z1 = cur0.z;
+			s1 = cur0.s;
+			t1 = cur0.t;
 		}
 
 		zstep = (z1 - z0)/(x1 - x0 + 2);
+		sstep = (s1 - s0)/(x1 - x0);
+		tstep = (t1 - t0)/(x1 - x0);
+
+		z = z0;
+		s = s0;
+		t = t0;
 
 		// fill line between cur0 and cur1
 		for (x = x0, z = z0; x <= x1; x++) {
+			Uint32 texel;
 			z += zstep;
-			gl_raster_point(x, y, z);
+			if (texflag) {
+				// due to precision errors, the interpolation may exceed a little bit
+				// FIXME: make sure this is not a problem and remove those tests
+				if (s > 1.0f) 
+					s = 1.0f;
+				else if (s < 0.0f)
+					s = 0.0f;
+
+				if (t > 1.0f)
+					t = 1.0f;
+				else if (t < 0.0f)
+					t = 0.0f;
+
+				struct texinfo *tex = &textures[texnr];
+				int si = (int)(s * (tex->w - 1)) * 3;
+				int ti = (int)(t * (tex->h - 1)) * 3;
+				const unsigned char *p = &tex->data[si + ti * tex->w];
+				Uint32 ri = p[0];
+				Uint32 gi = p[1];
+				Uint32 bi = p[2];
+				Uint32 ai = 0xFF;
+
+				texel = (ai << 24) | (ri << 16) | (gi << 8) | bi;
+			} else {
+				texel = sdl.color;
+			}
+			gl_raster_point(x, y, z, texel);
+			s += sstep;
+			t += tstep;
 		}
 
 		prev = cur0.y;
@@ -532,8 +598,8 @@ void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
 		     GLenum type, const GLvoid *pixels)
 {
 	struct texinfo *ti = &textures[texnr];
-	const char *src = pixels;
-	char *dst;
+	const unsigned char *src = pixels;
+	unsigned char *dst;
 	GLsizei h;
 
 	if (target != GL_TEXTURE_2D) {
@@ -575,7 +641,7 @@ void glTexImage2D(GLenum target, GLint level, GLint internal_fmt,
 	dst = ti->data;
 	for (h = 0; h < height; h++) {
 		// align to next row of pixels
-		src = (const char *)(((uintptr_t)src + sdl.unpack_align - 1) & ~(sdl.unpack_align - 1));
+		src = (const unsigned char *)(((uintptr_t)src + sdl.unpack_align - 1) & ~(sdl.unpack_align - 1));
 
 		memcpy(dst, src, width * 3);
 
