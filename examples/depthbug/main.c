@@ -38,11 +38,12 @@ void display(void)
 	glEnd();
 
 	// green
+	glScalef(1.0f, 1.0f, scale_z);
 	glBegin(GL_TRIANGLES);
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f( 0.5f, 1.0f,  0.0f);
-	glVertex3f( 0.5f,-1.0f, -scale_z);
-	glVertex3f( 0.5f,-1.0f,  scale_z);
+	glVertex3f( 0.5f,-1.0f, -1.0f);
+	glVertex3f( 0.5f,-1.0f,  1.0f);
 	glEnd();
 
 	glutSwapBuffers();

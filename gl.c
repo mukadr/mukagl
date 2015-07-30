@@ -86,7 +86,7 @@ void glRotatef(float angle, float x, float y, float z)
 
 void glScalef(float sx, float sy, float sz)
 {
-	mat44_scale(matp->mat, sz, sy, sz);
+	mat44_scale(matp->mat, sx, sy, sz);
 	update_transform();
 }
 
