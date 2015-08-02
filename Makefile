@@ -17,10 +17,10 @@ OBJS += vector.o
 
 all: $(PROG) examples test
 
-examples:
+examples: mukagl
 	make -C ./examples
 
-test:
+test: mukagl
 	make -C ./test
 
 mukagl: $(OBJS)
