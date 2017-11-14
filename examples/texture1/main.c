@@ -34,10 +34,6 @@ SDL_Surface *load_image(const char *filename)
 
 static void draw_wall(void)
 {
-	glBindTexture(GL_TEXTURE_2D, wtex);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	glEnable(GL_TEXTURE_2D);
-
 	glBegin(GL_TRIANGLES);
 
 	// left
@@ -59,6 +55,41 @@ static void draw_wall(void)
 	glVertex3f( 1.0f, -1.0f, 0.0f);
 
 	glEnd();
+}
+
+static void draw(void)
+{
+	glBindTexture(GL_TEXTURE_2D, wtex);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glEnable(GL_TEXTURE_2D);
+
+	glPushMatrix();
+		glTranslatef(0.0f, 0.0f, -1.0f);
+		draw_wall();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(0.0f, 0.0f, 1.0f);
+		draw_wall();
+	glPopMatrix();
+
+	glPushMatrix();
+		glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+		glTranslatef(0.0f, 0.0f, -1.0f);
+		draw_wall();
+	glPopMatrix();
+
+	glPushMatrix();
+		glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+		glTranslatef(0.0f, 0.0f, 1.0f);
+		draw_wall();
+	glPopMatrix();
+
+	glPushMatrix();
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		glTranslatef(0.0f, 0.0f, 0.0f);
+		draw_wall();
+	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
 }
@@ -74,9 +105,9 @@ void display(void)
 	// camera
 	glTranslatef(-camx, -camy, -camz);
 
-	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glRotatef(angle, 1.0f, 1.0f, 1.0f);
 
-	draw_wall();
+	draw();
 
 	if (++angle == 360)
 		angle = 0;
