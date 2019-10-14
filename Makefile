@@ -11,17 +11,13 @@ LDFLAGS = -lm $(shell pkg-config --libs sdl2)
 
 OBJS  = gl.o
 OBJS += gl_sdl2.o
-OBJS += math.o
 OBJS += matrix.o
 OBJS += vector.o
 
-all: $(PROG) examples test
+all: $(PROG) examples
 
 examples: mukagl
 	make -C ./examples
-
-test: mukagl
-	make -C ./test
 
 mukagl: $(OBJS)
 
@@ -34,6 +30,5 @@ mukagl: $(OBJS)
 clean:
 	rm -f $(PROG) *.o *.so .*.d
 	make clean -C ./examples
-	make clean -C ./test
 
-.PHONY: all clean examples test
+.PHONY: all clean examples

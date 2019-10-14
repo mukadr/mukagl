@@ -53,10 +53,6 @@
 		<Unit filename="../gl_sdl2.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../math.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../math.h" />
 		<Unit filename="../matrix.c">
 			<Option compilerVar="CC" />
 		</Unit>

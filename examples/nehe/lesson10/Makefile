@@ -12,7 +12,6 @@ LDFLAGS_GL  = -lGL -lGLU -lglut
 LIB  = ../../../gl.o
 LIB += ../../../gl_sdl2.o
 LIB += ../../../vector.o
-LIB += ../../../math.o
 LIB += ../../../matrix.o
 
 all: $(PROG)
